@@ -1,0 +1,142 @@
+o docker oferece uma camada de isolamento do SO, para a aplicação
+tirando dependencias diretas do sistema, tudo roda dentro do container 
+e fierente de uma VM que emula o SO e todas as suas dependências, o 
+container roda em cima do SO, emulando apenas as dependências.
+Isso tira a necesseciade de um hypervisor
+
+
+o kernel interage com o hardware, o OS fala com o kernel e o conteiner fala com o OS
+
+se tratando de virtualização:
+o hypervisor comunica com o kernel e emula as VMs  que vão ter seu próprio OS
+
+
+docker não faz virtualização, ela empacota e corre containers
+
+competely isolated enviroments 
+	lxc
+	lxd 
+	lxcfs
+	
+	
+	
+overview geral
+	cria um app
+	cria uma docker file
+	cria o yamal para orquestração
+	sobe os containers
+	
+	
+	
+	
+COnceitos do docker
+	imagens são pacotes com a aplicação que queremos rodar
+	
+	
+	container rodam essas imagens
+	
+	
+
+	
+	
+Docker file:
+	criar uma boa docker file é uma arte e eu definitivamente não sou artista 
+	leia a documentação https://docs.docker.com/reference/dockerfile/
+
+
+
+docker compose:
+		aprender yamal
+
+Comandos:
+
+	#roda o container (-d roda em bg) 
+	docker run [nome do container]
+	
+	#re-attach the container to screen 
+	docker attach [id do container]
+
+
+	#list container a rodar
+	docker ps
+
+	#info do container
+	doker ps -a
+	
+	#remove container
+	docker rm [nome do container]
+	
+	#lista as images
+	docker images
+	
+	#remove imagens 
+	#docker rmi [nome do container]
+	
+	#puxa a imagen e não corre
+	
+	docker pull [nome do container]
+	
+	#executar comandos dentro de um container (linux)
+	docker exec [nome do container] cat /etc/host
+	
+	#inspecionar container 
+	docker inspect [nome do container]
+	
+	#programas por linha de comandos
+	docker run -it
+	
+	#logs
+	docker logs [nome do container]
+	
+	#parar o docker 
+	docker stop [id do container]
+
+
+	#attach port to container 
+	
+	docker run -p [host port]:[container port]
+	
+	docker run  
+	-p 8080:8080 
+	-p 50000:50000 
+	-v "C:/Users/admin/jenkins-data":/var/jenkins_home 
+	jenkins/jenkins
+	
+	#persist data
+	mkdir [nome da pasta]
+	mkdir jenkins-data
+	no windows o caminho absoluto para pasta fica entre "" 
+	
+	
+	
+	#env variables
+	depois que uma imagem é feita, 
+	e uma foda ter que refazer para mudar um parâmetro. 
+	pra isso metemos variáveis de ambiente e quando chamamos
+	metemos um -i para passar os parms
+	
+	para procurar pelos parms, procure ni inspect o campo env
+	
+	--name = [nome do container]
+	-e = [nome da env var]
+	
+	
+	#CMD vs EntryPoint
+	
+	No caso de chamar um SO tipo Ubuntu ele vai iniciar e sair do programa 
+	pois não tem nenhum programa para correr
+	se metermos no parametro CMD do docker file alguma cena
+	ele vai correr aquela cena 
+	
+	pesquisar melhor depois 
+	
+	
+	
+	docker run  -p 38282:8080 --name blue-app -e APP_COLOR=blue kodekloud/simple-webapp
+	
+	docker run --name musql-db -e MYSQL_ROOT_PASSWORD=db_pass123  kodekloud/simple-webapp-mysql
+
+
+
+	#docker build
+	docker build . -t [nome da imagem]

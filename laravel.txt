@@ -1,0 +1,55 @@
+--db migrate
+cd Cinematic
+
+--verificar se o ficheiro .env existe no seu pc
+composer install 
+php artisan migrate:fresh
+php artisan db:seed
+
+
+
+
+--telescope
+composer require laravel/telescope --dev
+php artisan telescope:install
+php artisan migrate
+
+
+
+--sumary of logs
+composer require fruitcake/laravel-telescope-toolbar --dev
+php artisan vendor:publish--provider="Fruitcake\\TelescopeToolbar\\ToolbarServiceProvider
+
+
+
+criando os controladores e models
+
+	----------------recibo
+	--create controller with all crud functions
+	php artisan make:controller ReciboController --resource
+
+	php artisan make:model Recibo
+	php artisan make:model Bilhete
+	php artisan make:model Lugar
+	
+	php artisan make:model Cliente
+	php artisan make:model Sessoe
+	php artisan make:model Sala
+	
+	
+	php artisan make:model User
+	php artisan make:model Configuracao
+	php artisan make:model Genero
+
+
+	php artisan make:controller LugaresController --resource
+	php artisan make:controller BilhetesController --resource
+	php artisan make:controller RecibosController --resource
+	
+	php artisan make:controller ClientesController --resource
+	php artisan make:controller SessoesController --resource
+	php artisan make:controller SalasController --resource
+
+	php artisan make:controller UsersController --resource
+	php artisan make:controller FilmesController --resource
+
