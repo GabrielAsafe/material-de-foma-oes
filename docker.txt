@@ -71,7 +71,11 @@ Comandos:
 	
 	#remove imagens 
 	#docker rmi [nome do container]
-	
+
+
+	#remover tudo 
+	docker system prune -a --volumes
+
 	#puxa a imagen e não corre
 	
 	docker pull [nome do container]
