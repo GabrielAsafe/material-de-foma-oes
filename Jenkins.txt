@@ -1,0 +1,103 @@
+Jenkins é um servidor de automação. Serve para CI/CD. Permite fazer build das merdas etc
+
+estou utilizando o docker para isso 
+
+docker run -d -v jenkins_home:/var/jenkins_home -p 8080:8080 -p 50000:50000 --restart=on-failure jenkins/jenkins
+
+Na primeira vez ele precisa instalar. Se não instalar limpa a cash do bowser. No meu caso, por estar usando outros servidores ele não queria funcionar
+
+para evitar dor de cabeça instale o sudo e o vim no docker 
+	#no cmd do windows docker exec -u root -t -i [container_id] /bin/bash
+	apt-get update
+	apt-get install sudo
+	apt-get install vim
+
+
+
+Jobs
+	Tarefas que queremos que o jekins faça
+
+	Usando o frrestyle project->(configure tab) -> buld-> execute shell
+
+	existe diferença entre usa "" e ''  aspas permite passar variáveis usando $()
+
+	no bash(dentro do docker->exec)
+		echo "puta"
+
+		echo "O dia e hora são $(date)"
+
+		#para criar variáveis no bash não pode ter espaços
+		name=Putas mexicanas # se for nome = putas mexicanas não funciona
+		echo "Queria estar no méxico para comer $name"
+		
+		#Gravar arquivos dentro do container
+		(rm -rf /tmp/info para deletar file (-rd para diretórios))
+		name="Putas mexicanas" # se for nome = putas mexicanas não funciona
+		echo "Queria estar no méxico para comer $name" > /tmp/info
+		
+		#criando um script que aceita parâmetros | crie uma pasta e importe já que não dá para usar o vi
+		#se der erro de execussão ls -l [nome do ficheiro para ver permissões]
+		#para alterar permissão de execussão. O docker não tem sudo no jenkins 
+			#no cmd do windows docker exec -u root -t -i [container_id] /bin/bash
+			#navegue até o ficheiro e faça o chmod
+		
+			#!/bin/bash
+			
+			NAME=$1
+			LASTNAME=$2
+			
+			echo "Hello, $NAME $LASTNAME"
+			
+			
+			no JOB passamos o caminho /tmp/scriptsJ/script.sh 
+			
+			Name="gabriel"
+			LastName="martins"
+			/tmp/scriptsJ/script.sh $Name $LastName
+
+	Parâmetros no Jenkins	(não consigo fazer o bash funcionar mesmo com o código estando igual)
+		JOB -> general-> this project is parameterized
+		o nome é o nome da variável(parm) e o value o valor dela
+		echo "hello $Fist_Name $Last_Name "
+		
+		
+	
+	
+	Jankins and docker (não consigo conectar )
+		criar a docker file
+		no cmd crea a chave do ssh-> ssh-keygen -f remote-key
+		criar a doker-compose.yml
+		Criar a imagem com docker build(cria imagem com base no dockerfile)
+		faz o docker-compose up para criar o container com base no dockerCompose-yml(que tem as duas imagens e as outras configs)
+	
+		logar no container do jenkins 
+			apt-get update
+			apt-get install sudo
+			sudo apt install openssh-server
+			
+			ssh nomeDoUser@nomDoHost
+			
+			e fazer um ssh no centos7 que acabei de criar
+		
+	Security
+		é feita por plugins. padrão de segurança
+		
+	ENV variables
+		global
+			https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#using-environment-variables
+		Custom
+			configure->global properties-> enviromentVariables
+			
+		Cron variables	
+			Dentro de um job -> Build periodically
+				e basta escrever a cron expression
+				
+		External execution
+			Jenkins permite executar os jobs externamente mas para isso precisa de um brumb
+				# Obter crumb
+				CRUMB=$(curl -u seu_usuario:seu_token_de_acesso 'http://seu_jenkins_url/crumbIssuer/api/json' | jq -r '.crumb')
+				CRUMB=$(curl -u "seu_usuario:seu_token_de_acesso" -s 'http://seu_jenkins_url/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)')  ##no curso
+
+				# Disparar construção de job
+				curl -u seu_usuario:seu_token_de_acesso -X POST 'http://seu_jenkins_url/job/seu_job/build' -H "Jenkins-Crumb: $CRUMB"
+				curl -u "seu_usuario:seu_token_de_acesso" -H "$CRUMB" -X POST 'http://seu_jenkins_url/job/seu_job/build'  ##no curso

@@ -46,7 +46,60 @@ Docker file:
 
 
 docker compose:
-		aprender yamal
+		Parâmetros Comuns do docker-compose.yml
+		version: Define a versão do formato do arquivo Compose.
+		services: Define os contêineres que compõem a aplicação.
+		image: Especifica a imagem Docker a ser usada.
+		build: Define as opções de build do Docker, como o diretório do Dockerfile.
+		ports: Mapeia as portas do contêiner para o host.
+		volumes: Monta volumes, que podem ser dados persistentes ou diretórios de configuração.
+		environment: Define variáveis de ambiente para os contêineres.
+		networks: Conecta o serviço a redes definidas no arquivo.
+		depends_on: Define a ordem de inicialização dos serviços.
+		networks: Define redes customizadas que podem ser usadas pelos serviços.
+		volumes: Define volumes persistentes que podem ser usados pelos serviços.
+		Comandos Comuns do docker-compose
+		docker-compose up: Cria e inicia os contêineres conforme definido no docker-compose.yml.
+		-d: Executa os contêineres em segundo plano (modo detached).
+		--build: Força o re-build das imagens antes de iniciar os contêineres.
+		docker-compose down: Para e remove os contêineres, redes e volumes definidos no arquivo.
+		-v: Remove volumes associados aos contêineres.
+		docker-compose ps: Lista os contêineres em execução definidos no docker-compose.yml.
+		docker-compose logs: Exibe os logs dos serviços.
+		-f: Segue os logs (modo "follow").
+		docker-compose exec [service] [command]: Executa um comando em um contêiner em execução.
+		docker-compose scale [service]=[num]: Escala um serviço para o número especificado de contêineres.
+		Exemplo Prático
+		Suponha que você tenha uma aplicação web simples com um front-end em Nginx e um banco de dados PostgreSQL. Seu docker-compose.yml pode parecer assim:
+			version: '3.8'
+			services:
+			  web:
+				image: nginx:alpine
+				ports:
+				  - "8080:80"
+				volumes:
+				  - ./web:/usr/share/nginx/html
+				depends_on:
+				  - db
+				networks:
+				  - app-network
+
+			  db:
+				image: postgres:13
+				environment:
+				  POSTGRES_DB: exampledb
+				  POSTGRES_USER: exampleuser
+				  POSTGRES_PASSWORD: examplepass
+				volumes:
+				  - db-data:/var/lib/postgresql/data
+				networks:
+				  - app-network
+
+			networks:
+			  app-network:
+
+			volumes:
+			  db-data:
 
 Comandos:
 

@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  jenkins:
+    container_name: jenkins
+    image: jenkins/jenkins
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    networks:
+      - net
+    restart: on-failure
+
+  remote_host:
+    container_name: remote-host
+    build:
+      context: ./centos7  # Certifique-se de que o caminho esteja correto
+    ports:
+      - "8081:8081"
+      - "2222:22"
+    networks:
+      - net
+    depends_on:
+      - jenkins  # Garante que o container jenkins seja iniciado primeiro
+
+networks:
+  net:
+
+volumes:
+  jenkins_home:
+    driver: local
