@@ -80,7 +80,7 @@ Jobs
 			e fazer um ssh no centos7 que acabei de criar
 		
 	Security
-		é feita por plugins. padrão de segurança
+		
 		
 	ENV variables
 		global
@@ -94,10 +94,179 @@ Jobs
 				
 		External execution
 			Jenkins permite executar os jobs externamente mas para isso precisa de um brumb
-				# Obter crumb
-				CRUMB=$(curl -u seu_usuario:seu_token_de_acesso 'http://seu_jenkins_url/crumbIssuer/api/json' | jq -r '.crumb')
-				CRUMB=$(curl -u "seu_usuario:seu_token_de_acesso" -s 'http://seu_jenkins_url/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)')  ##no curso
+			
+			
+				no jenkins: nas versões mais novas do jenkis precisamos desativar o csrf manualmente. Sem issão não podemos fazer os requests, mesmo com os crumbs
+					menage jenkins -> Script console
+						import jenkins.model.Jenkins
+						def instance = Jenkins.instance
+						instance.setCrumbIssuer(null)
+			
+				no container :
+										[user:pass]								[url para o jenkis. no meu caso estou na rede do docker]   [o grep corta da requisição apenas a key do crumb]
+					sem parâmetros:
+						CRUMB=$(curl -u admin:b598548b8fa94fba862855b09a759334 'http://jenkins:8080/crumbIssuer/api/json' | grep -o '"crumb":"[^"]*' | cut -d':' -f2 | tr -d '"')
+						echo $CRUMB
+						
+						# Disparar construção de job: agora é ir ver se compilou no jenkins 
+						curl -u admin:b598548b8fa94fba862855b09a759334 -X POST 'http://jenkins:8080/job/noParmsJob//build' -H "Jenkins-Crumb: $CRUMB"
+					
+					com parâmetros:	
+					curl -u admin:b598548b8fa94fba862855b09a759334 -X POST 'http://jenkins:8080/job/WithParmsJob/buildWithParameters?querSexo=false' -H "Jenkins-Crumb: $CRUMB"
+						
+						
+		Email
+			Quando se instala o jenkis ele instala o pluging de email, mas como o google não permite mais acessar a cena do acesso menos seguro não consigo fazer essa parte
+			
+			job -> post built actions:
+				marcar as checkboxes
+				escrever os emails
+		
+		
+		
+		Maven
+			mavenIntegration
+			
+			clone repo from git: https://github.com/jenkins-docs/simple-java-maven-app
+			
+			criar um job -> source code menagement 
+				passa o link do repo
+			
+			Conceito de workspace:
+				quando se executa um job, as coisas vão parar em um workspace 
+				
+				docker exec -ti jenkins bash
+				
+				ls -l var/jenkins_home/workspace
+				
+			Criando a maven installation
+			
+				manage/configureTools/
+					configura com qualquer nome
+			
+			
+				no job:
+					build-> invoke top level maven target
+					Seleciona o nome que demos previamente
+					Goals-> -B -DskipTestes clean package
+					
+					após clicar em build, vá até o o caminho ls -l var/jenkins_home/workspace/Maven-project/target
+					
+					volta no job-> cria outra cena do maeven e escreve test para poder testar
+						os resultados ficam na pasta ls -l var/jenkins_home/workspace/Maven-project/target/surefire-reports
+					
+					
+					quando os testes passarem, execute o jar em uma bash script pelo jenkins
+					
+					java -jar /var/jenkins_home/workspace/Maven-project/target/my-app-1.0-SNAPSHOT.jar
+					
+					
+					No job:
+					´	nova task ->post build actions -> publis junit test 
+							target/surefire-reports/*.xml
+							
+							
+							
+							
+					O resultado de uma build é chamada de archive. Se quisermos guardar esse resultado é no post build actions 
+					No job:
+					´	nova task ->post build actions -> Archive the artifacts
+							target/*.jar
+			
+			
+			
+			Seed Job(DSL)
+				job que cria job http://localhost:8080/plugin/job-dsl/api-viewer/index.html
+				
+				
+				Olha na documentação para maiores informações (ou não)
+				
+				job('baleia') 
+				{
+				  description('minha descrição')
+				  
+				  parameters {
+					stringParam('STRING_PARAM', 'defaultValue', 'Uma descrição para o parâmetro string')
+					booleanParam('BOOLEAN_PARAM', true, 'Uma descrição para o parâmetro boolean')
+					choiceParam('CHOICE_PARAM', ['Opção 1', 'Opção 2', 'Opção 3'], 'Uma descrição para o parâmetro de escolha')
+					textParam('TEXT_PARAM', 'Texto padrão', 'Uma descrição para o parâmetro de texto')
+					
+				  }
+				  scm{
+					git('https://github.com/jenkins-docs/simple-java-maven-app/branches')
+				  }
+				  
+				  triggers{
+					cron('H 5 * * 7')
+				  }
+				  
+				  steps{
+					shell("echo 'sou uma putinha suja'")
+				  }
+				  
+				  publishers{
+					mailer('testeMail@mail.com',true,true)
+				  }
+				}
+				
+		
+		
+		pipelines
+		
+			pipeline {
+				agent any
+				
+				environment{
+				   NAME = 'Suruba'
+					LAST_NAME = 'de_nego'  // Changed variable name to uppercase and removed spaces
+					SECRET = credentials('SECRET')  // Changed variable name to uppercase
+				}
 
-				# Disparar construção de job
-				curl -u seu_usuario:seu_token_de_acesso -X POST 'http://seu_jenkins_url/job/seu_job/build' -H "Jenkins-Crumb: $CRUMB"
-				curl -u "seu_usuario:seu_token_de_acesso" -H "$CRUMB" -X POST 'http://seu_jenkins_url/job/seu_job/build'  ##no curso
+				stages {
+					stage('Build') {
+						steps {
+							
+							echo 'Building'
+							
+							sh ' echo "posso executar vários passos no mesmo stage"'
+							
+							sh '''
+								echo "esse passo é em multi-line $NAME $LAST_NAME $SECRET"
+							
+							'''
+
+						}
+					}
+					stage('Test') {
+						steps {
+							echo 'Testing'
+						}
+					}
+					stage('Deploy') {
+						steps {
+							echo 'Deploying'
+						}
+					}
+				}
+				 post {
+					always {
+						echo 'This will always run'
+					}
+					success {
+						echo 'This will run only if the pipeline succeeds'
+						// Adicione aqui outras ações de sucesso, como notificações
+					}
+					failure {
+						echo 'This will run only if the pipeline fails'
+						// Adicione aqui outras ações de falha, como notificações ou limpeza
+					}
+					unstable {
+						echo 'This will run if the pipeline is unstable'
+						// Ações para instabilidade, como o envio de relatórios específicos
+					}
+					changed {
+						echo 'This will run if the pipeline state changes compared to the last run'
+						// Ações para mudanças de estado, como alertas ou logs específicos
+					}
+				}
+			}
