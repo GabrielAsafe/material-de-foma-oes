@@ -284,3 +284,10 @@ Fim do curso
 
 	Instalar o docker dentro de uma imagem do docker
 	
+	no meu caso que usei ele direto no windows ao invés de intalar um vm linux e a partir dela instalar o docker e depois criar os containers
+	eu fico precisando de um arquivo Docker.sock que existe no linux mas não no windows por usar TCP como protocolo de transmissão de dados
+	Como o container precisaria de acesso a esse arquivo, que seria passado no volume do dockercompose "/var/run/docker.sock://var/run/docker.sock"
+	
+	
+	
+	esquece estava carente. só precisava dessa merda de linha
