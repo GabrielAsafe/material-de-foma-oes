@@ -1,0 +1,8 @@
+"""
+virtualenv -p python3 venv
+
+cd scrips
+
+activate / deactivate
+"""
+

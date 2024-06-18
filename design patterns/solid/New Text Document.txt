@@ -1,0 +1,42 @@
+single responsbility 
+
+	uma classe por funcionalidade para resolver um problema
+
+	se por exemplo uma classe responder xml e jason precisa ter duas classes 
+
+
+	deve haver apenas uma razão para uma classe mudar. Ou seja, se a classe faz apenas uma coisa i.e salvar um txt
+	e por algum motivo ela passa a receber um texto, editar, e depois salvar; ela passa a fazer 3 coisas e se um ou mais delas precisar de mudanças, violamos esse princípio
+
+
+open closed principle
+
+	aberto para extensão e fechado para edição evitando repetição de código
+	
+	uma classe deve porder extender outra e adicionar funcionalidade mas a subclasse não pode modificar a superclasse
+	
+	
+	
+liskov substitution principle
+
+	se uma classe gera um output, substituir ela por uma classe derivada (subclasse) nao deveria alterar o output
+	
+	pelo que entendi, uma classe pode ter um comportamento que acabe quebrando uma subclasse derivada
+	para evitar que ela se quebre, criamos uma superclasse apenas com o que ambas tem em comum e que garanta que uma não destua a outra
+	
+	
+	
+
+interface segragation principle
+	clientes não deveriam ser forçadas a depender de interfaces que eles não usam
+	
+	
+	se uma interface está sendo implementada por uma classe e essa classe não implementar todos os métodos, não implemente essa interface
+	
+	
+dependency inversion principle
+
+	dependecy = algo que precisamos providenciar para a funcionalidade que estamos codando. O parametro de uma função
+	
+	ao invés de deixar a função criar objetos dentro dela, ela recebe os objetos já criados 
+	quando fazemos isso podemos mudar o objeto de xml para json na classe externa e só alteramos em 1 lugar

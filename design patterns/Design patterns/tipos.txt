@@ -1,0 +1,12 @@
+Creational
+
+	lida com o processo de criação de objetos
+	
+	
+structural
+	
+	diz como compor objetos para derivar funcionalidades deles
+	
+	
+behavioral 
+	how classes behave and interact with other objects

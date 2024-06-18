@@ -1,0 +1,8 @@
+objetos imutáveis 
+construtores com múltiplos parâmetros (bad coding practice)
+parâmetros que são outros objetos, ou seja, requer passos anteriores sendo bem feitos (Objeto montado em partes)
+
+
+usamos quando temos um processo de construção complexo envolvendo vários passos 
+
+nele tiramos a responsabilidade do cliente pela lógica relacionada de construção 
