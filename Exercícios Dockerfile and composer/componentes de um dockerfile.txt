@@ -1,0 +1,46 @@
+FROM: Define a imagem base a partir da qual a nova imagem será construída. É a primeira instrução em um .
+FROM ubuntu:20.04
+
+LABEL: Adiciona metadados à imagem, como versão, descrição e autor.
+LABEL maintainer="seu-email@exemplo.com"
+
+RUN: Executa comandos durante a construção da imagem. Pode ser usado para instalar pacotes e executar scripts.
+RUN apt-get update && apt-get install -y nginx
+
+COPY: Copia arquivos ou diretórios do host para o sistema de arquivos da imagem.
+COPY ./meu-arquivo.txt /caminho/no/container/
+
+ADD: Similar ao COPY, mas com funcionalidades adicionais, como descompactar arquivos.
+ADD arquivo.tar.gz /diretorio/no/container/
+
+CMD: Especifica o comando padrão a ser executado quando um contêiner é iniciado a partir da imagem. Pode ser sobrescrito na linha de comando docker run.
+CMD ["param1", "param2"]
+CMD ["nginx", "-g", "daemon off;"]
+
+ENTRYPOINT: Define o executável que será usado como ponto de entrada para o contêiner. Diferente de CMD, o ENTRYPOINT não é sobrescrito.
+ENTRYPOINT ["executable", "param1", "param2"]
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
+
+ENV: Define variáveis de ambiente no contêiner.
+ENV PATH=/usr/local/nginx/bin:$PATH
+
+EXPOSE: Informa quais portas o contêiner estará escutando em tempo de execução.
+EXPOSE 80
+
+VOLUME: Cria um ponto de montagem para volumes, permitindo que dados sejam persistidos ou compartilhados.
+VOLUME ["/data"]
+
+USER: Define o usuário que será utilizado para executar os comandos seguintes.
+USER www-data
+
+WORKDIR: Define o diretório de trabalho para as instruções seguintes. | quando você define um WORKDIR em um Dockerfile, todas as instruções subsequentes que usam caminhos de arquivos ou diretórios serão relativas ao diretório de trabalho especificado. Isso inclui comandos como COPY, RUN, ADD, CMD, ENTRYPOINT, entre outros. Se você não definir um WORKDIR, o Docker usará o diretório raiz (/) como o diretório de trabalho padrão.
+WORKDIR /app
+
+ARG: Define variáveis que podem ser passadas durante o build da imagem.
+ARG VERSION=1.0.0
+
+STOPSIGNAL: Define o sinal que será usado para parar o contêiner.
+STOPSIGNAL SIGTERM
+
+ONBUILD: Instruções que serão executadas quando a imagem for usada como base para outra imagem.
+ONBUILD RUN echo "Esta instrução será executada em uma build filha"

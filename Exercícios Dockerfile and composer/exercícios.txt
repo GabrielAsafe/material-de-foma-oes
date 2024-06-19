@@ -1,0 +1,242 @@
+	!!! AVISO !!!!
+	NADA FOI TESTADO E O COPOSER ESTÁ COM TABS AO INVÉS DE ESPAÇOS
+
+
+
+Exercício 1: Criando um Dockerfile para um Aplicativo Node.js
+Pergunta:
+Crie um Dockerfile para um simples aplicativo Node.js. O aplicativo deve ser capaz de rodar um arquivo app.js que está no diretório atual.
+
+# Usar uma imagem base oficial do Node.js
+FROM node:14
+
+# Criar um diretório de trabalho dentro do contêiner
+WORKDIR /usr/src/app
+
+# Copiar o package.json e package-lock.json para o diretório de trabalho
+COPY package*.json ./
+
+# Instalar as dependências do projeto
+RUN npm install
+
+# Copiar todos os arquivos do diretório atual para o diretório de trabalho do contêiner
+COPY . .
+
+# Expor a porta que a aplicação irá rodar
+EXPOSE 3000
+
+# Comando para rodar a aplicação
+ENTRYPOINT ["node", "app.js"]
+
+
+
+Exercício 2: Criando um docker-compose.yml para uma Aplicação Web e Banco de Dados
+Pergunta:
+Crie um arquivo docker-compose.yml para rodar uma aplicação web Node.js que se comunica com um banco de dados MongoDB. A aplicação Node.js deve ser construída a partir do Dockerfile criado no exercício 1.
+
+
+version: '3.9'
+
+services:
+	app_node:
+		build . #busca a imagem local
+		ports:
+			- "3000:3000"
+		depends_on:
+			- banco_de_dados_Mongo
+		nerworks:
+			rede_interna:
+		
+
+	banco_de_dados_Mongo:
+		image: mongo:latest
+		ports:
+			- "27017:27017"
+		volumes:
+			- mongo-data:/data/db
+		nerworks:
+			rede_interna:
+nerworks:
+	rede_interna:
+		drivers: host
+			
+volumes:
+	mongo-data:
+	
+
+Exercício 3: Dockerizando uma Aplicação Python Flask
+Pergunta:
+Crie um Dockerfile para uma aplicação Python Flask. 
+A aplicação deve ser capaz de rodar um arquivo app.py e 
+usar um ambiente virtual para instalar as dependências listadas 
+em um arquivo requirements.txt.
+
+
+# Usar uma imagem base oficial do Python
+FROM python:3.9
+
+# Criar um diretório de trabalho dentro do contêiner
+WORKDIR /usr/src/app
+
+# Copiar o requirements.txt para o diretório de trabalho
+COPY requirements.txt ./
+
+# Instalar as dependências do projeto
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copiar todos os arquivos do diretório atual para o diretório de trabalho do contêiner
+COPY . .
+
+# Expor a porta que a aplicação irá rodar
+EXPOSE 5000
+
+# Comando para rodar a aplicação
+CMD ["python", "app.py"]
+
+
+
+Exercício 4: Criando um docker-compose.yml para uma Aplicação Flask e Redis
+Pergunta:
+Crie um arquivo docker-compose.yml para rodar uma aplicação Flask que se 
+comunica com um serviço Redis. A aplicação Flask deve ser construída a partir 
+do Dockerfile criado no exercício 3.
+
+
+version: '3.9'
+
+services:
+	aplicacao_flask:
+		build .
+		ports:
+			- "5000:5000"
+		restart: always
+		depends_on:  # Define dependência do serviço web com o serviço db
+			- redis
+	redis:
+		image: redis:latest
+		ports:
+			- "6379:6379"
+		restart: always
+
+nerworks:
+	rede_interna:
+		drivers: host
+		
+		
+
+
+Exercício 5: Configurando um Serviço WordPress com MySQL
+Pergunta:
+Crie um arquivo docker-compose.yml para rodar uma aplicação WordPress 
+com um banco de dados MySQL. O serviço WordPress deve estar acessível 
+na porta 8000.
+###ter em consideração se precisa de variáveis de ambiente
+
+version: '3.9'
+
+services:
+	WordPress:
+		image: wordpress:latest
+		ports:
+			- "8000:80"
+		restart: always
+		environment:
+			WORDPRESS_DB_HOST: db
+			WORDPRESS_DB_USER: exampleuser
+			WORDPRESS_DB_PASSWORD: examplepass
+			WORDPRESS_DB_NAME: exampledb
+		depends_on:  # Define dependência do serviço web com o serviço db
+			- MySQL
+	MySQL:
+		image: mysql:latest
+		environment:
+			MYSQL_DATABASE: exampledb
+			MYSQL_USER: exampleuser
+			MYSQL_PASSWORD: examplepass
+			MYSQL_ROOT_PASSWORD: rootpass
+		ports:
+			- 3306:3306 # eu acho
+		restart: always
+		volumes:
+			- mysql-data:/var/lib/mysql
+
+volumes:
+  mysql-data:
+
+nerworks:
+	rede_interna:
+		drivers: host
+		
+
+
+Exercício 6: Dockerizando uma Aplicação Java Spring Boot
+Pergunta:
+Crie um Dockerfile para uma aplicação Java Spring Boot que gere um 
+arquivo jar chamado app.jar.
+
+
+FROM openjdk:11
+
+WORKDIR /usr/src/app
+
+COPY app.jar .
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
+
+
+Exercício 7: Criando um docker-compose.yml para uma Aplicação Java com PostgreSQL
+Pergunta:
+Crie um arquivo docker-compose.yml para rodar uma aplicação Java Spring Boot 
+que se comunica com um banco de dados PostgreSQL. 
+A aplicação Java deve ser construída a partir do Dockerfile 
+criado no exercício 6.
+
+Como realmente deve ser feito: entra nos sites e copia o texto
+
+
+
+version: '3.9'
+services:
+	app_java:
+		build .
+		
+		ports:
+			- "8080:80"
+			
+		depends_on:  
+			- BD_postgress
+			
+		restart: always
+		environment:
+			SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/exampledb
+			SPRING_DATASOURCE_USERNAME: exampleuser
+			SPRING_DATASOURCE_PASSWORD: examplepass
+
+	BD_postgress:
+		image: postgres
+		restart: always
+		# set shared memory limit when using docker-compose
+		shm_size: 128mb
+		# or set shared memory limit when deploy via swarm stack
+		#volumes:
+		#  - type: tmpfs
+		#    target: /dev/shm
+		#    tmpfs:
+		#      size: 134217728 # 128*2^20 bytes = 128Mb
+		environment:
+		  POSTGRES_PASSWORD: example
+
+		adminer:
+			image: adminer
+			restart: always
+			ports:
+			  - 8080:8080
+		environment:
+			POSTGRES_DB: exampledb
+			POSTGRES_USER: exampleuser
+			POSTGRES_PASSWORD: examplepass
+		volumes:
+			- postgres-data:/var/lib/postgresql/data
+
+volumes:
+	postgres-data:

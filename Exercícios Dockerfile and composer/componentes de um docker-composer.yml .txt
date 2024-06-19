@@ -1,0 +1,172 @@
+version: '3'  # Versão do formato do Docker Compose
+
+services:
+  web:  # Nome do serviço
+    build: ./webapp  # Constrói a imagem usando o Dockerfile local
+    
+	  image: nginx:latest  # Imagem Docker a ser usada para o serviço
+	
+	depends_on:  # Define dependência do serviço web com o serviço db
+      - db
+    environment:  # Variáveis de ambiente para o serviço web
+      NODE_ENV: production
+    restart: always  # Política de reinicialização sempre que o serviço web for parado
+    ports:  # Mapeamento de portas (host:contêiner)
+      - "8080:80"
+    volumes:  # Mapeamento de volumes (host:contêiner)
+      - ./web:/app
+    networks:  # Redes a serem conectadas
+      - frontend
+      - backend
+    labels:  # Rótulos para metadados adicionais
+      com.example.description: "Serviço web principal"
+    healthcheck:  # Teste de saúde personalizado para o serviço web
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+    logging:  # Configuração avançada de logs para o serviço web
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+  db:  # Nome do serviço
+    image: mysql:5.7  # Imagem Docker a ser usada para o serviço db
+    environment:  # Variáveis de ambiente para o serviço db
+      MYSQL_ROOT_PASSWORD: example
+    volumes:  # Mapeamento de volumes (host:contêiner)
+      - db_data:/var/lib/mysql
+    networks:  # Redes a serem conectadas
+      - backend
+
+volumes:
+  db_data:  # Definição de volumes nomeados
+
+networks:
+  frontend:  # Definição de rede nomeada
+    driver: bridge  # Driver de rede a ser usado
+  backend:  # Definição de outra rede nomeada
+    driver: bridge  # Driver de rede a ser usado
+
+
+### Explicações dos Parâmetros:
+
+- **version**: Define a versão do formato do Docker Compose.
+
+- **services**: Define os serviços que compõem o aplicativo Docker.
+
+  - **web**: Serviço principal do aplicativo web.
+
+    - **build**: Constrói a imagem a partir de um Dockerfile local (`./webapp`).
+    
+    - **depends_on**: Define que o serviço web depende do serviço db.
+    
+    - **environment**: Define a variável de ambiente `NODE_ENV` como `production` para o serviço web.
+    
+    - **restart**: Configura o serviço web para reiniciar sempre que for parado.
+    
+    - **ports**: Mapeia a porta `8080` do host para a porta `80` do contêiner.
+    
+    - **volumes**: Monta o diretório `./web` do host dentro de `/app` no contêiner.
+    
+    - **networks**: Conecta o serviço web às redes `frontend` e `backend`.
+    
+    - **labels**: Adiciona um rótulo para descrever o serviço web.
+    
+    - **healthcheck**: Define um teste de saúde personalizado para o serviço web usando `curl`.
+    
+    - **logging**: Configuração avançada de logs para o serviço web.
+
+  - **db**: Serviço de banco de dados MySQL.
+
+    - **image**: Utiliza a imagem `mysql:5.7`.
+    
+    - **environment**: Define a senha do root do MySQL como `example`.
+    
+    - **volumes**: Persiste os dados do MySQL em um volume nomeado `db_data`.
+    
+    - **networks**: Conecta o serviço db à rede `backend`.
+
+- **volumes**: Define um volume nomeado `db_data` para persistir os dados do MySQL.
+
+- **networks**: Define duas redes nomeadas: `frontend` e `backend`, usando o driver de rede padrão `bridge`.
+
+
+
+
+
+###Drivers de rede
+
+No Docker Compose, você pode especificar diferentes tipos de drivers de rede para controlar como os contêineres em seus serviços se comunicam e se conectam a redes externas. Aqui estão os tipos de drivers de rede mais comuns disponíveis no Docker Compose:
+
+### 1. **bridge**
+O driver de rede `bridge` cria uma rede interna privada que permite a comunicação entre contêineres no mesmo host. É o driver padrão usado quando nenhum driver é especificado. É adequado para comunicação entre contêineres em uma única máquina.
+
+Exemplo de uso:
+```yaml
+networks:
+  frontend:
+    driver: bridge
+```
+
+### 2. **host**
+O driver de rede `host` remove o isolamento da rede do contêiner e faz com que ele compartilhe o namespace de rede do host Docker. Isso significa que o contêiner não terá sua própria pilha de rede e usará a rede do host diretamente. Pode ser útil para aplicações que necessitam de alto desempenho de rede ou quando você deseja que o contêiner use diretamente as interfaces de rede do host.
+
+Exemplo de uso:
+```yaml
+networks:
+  frontend:
+    driver: host
+```
+
+### 3. **overlay**
+O driver de rede `overlay` cria uma rede que conecta múltiplos hosts Docker para permitir a comunicação entre contêineres em diferentes hosts. É utilizado em ambientes de múltiplos hosts e geralmente em orquestradores como Docker Swarm e Kubernetes para comunicação entre nós.
+
+Exemplo de uso:
+```yaml
+networks:
+  backend:
+    driver: overlay
+```
+
+### 4. **macvlan**
+O driver de rede `macvlan` permite que você atribua um endereço MAC e IP específico para cada contêiner, tornando-os aparecerem como dispositivos físicos na rede. É útil quando você precisa que os contêineres sejam acessíveis diretamente na rede local com IPs específicos.
+
+Exemplo de uso:
+```yaml
+networks:
+  backend:
+    driver: macvlan
+```
+
+### 5. **none**
+O driver de rede `none` desativa completamente a rede para o contêiner. Isso pode ser usado em situações onde você deseja que o contêiner não tenha conectividade de rede.
+
+Exemplo de uso:
+```yaml
+networks:
+  isolated_net:
+    driver: none
+```
+
+### 6. **Customizado**
+Além dos drivers padrão mencionados acima, você também pode criar e usar drivers de rede personalizados para atender a necessidades específicas do seu ambiente de rede.
+
+Exemplo de uso:
+```yaml
+networks:
+  my_custom_network:
+    driver: my-custom-driver
+    driver_opts:
+      option1: value1
+      option2: value2
+```
+
+### Observações
+
+- **Compatibilidade**: Nem todos os drivers de rede estão disponíveis em todas as plataformas Docker. Alguns podem ser específicos para Docker Swarm, enquanto outros são adequados apenas para Docker em ambientes locais.
+  
+- **Configuração Adicional**: Alguns drivers de rede podem exigir configurações adicionais, como opções de driver (`driver_opts`), para definir comportamentos específicos.
+
+Ao escolher um driver de rede no Docker Compose, é importante considerar os requisitos de comunicação entre seus contêineres, a topologia da sua infraestrutura Docker e quaisquer limitações ou necessidades específicas do seu ambiente.
