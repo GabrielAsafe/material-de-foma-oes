@@ -9,6 +9,7 @@ o plano de ação
 		comunicar com os funcionários sobre a estratégia
 		entender pq quer a mudança
 
+
 	levanta os requisitos
 		críticos, etc
 
@@ -24,19 +25,37 @@ o plano de ação
 
 
 	gap analisys 
+		pesqiosa de soluções
+		levantamento de requisitos
+		fazer a grelha de soluçõess
 
 	tco
+		clowd ?
+		implementação
+		deployment
+		impactos no
+			hardware
+			software
+			RH:
+				-treinamentos
+				-alocações
+				-mudança de tarefas...
+				-contratar especialistas
+			
+		desenvolvimento a medida?
+			custo de manutenção
 
-	analise ca cultura
 
-	clowd ?
-
-	implementação
-
-	deployment
+		outsource ou insource
 
 
+	analise da cultura
+		entender as regras escristas e orais do ambiente empresarial para não propor algo que mude radicalmente o modos operandi e evitar a resistência a mudança
 
+
+	
+
+------------------------------------------
 Grelha de gap analysis
 
 	análise detalhada dos CRM's e ERP's
@@ -65,14 +84,9 @@ Recursos internos ou externos
 	
 Cultura organizacional
 	qual a cultura do país ? 
-
 	quam manda na empresa ? 
 	quem toma as decisões 
 	quem manda é lider de jure(quem tem o título) ou lider de facto(quem realmente tem as bolas, competência e carísma) ? 
-
-
-
-
 
 identificar os key users
 
