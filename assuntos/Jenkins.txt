@@ -288,6 +288,37 @@ Fim do curso
 	eu fico precisando de um arquivo Docker.sock que existe no linux mas não no windows por usar TCP como protocolo de transmissão de dados
 	Como o container precisaria de acesso a esse arquivo, que seria passado no volume do dockercompose "/var/run/docker.sock://var/run/docker.sock"
 	
-	
-	
 	esquece estava carente. só precisava dessa merda de linha
+	
+	
+	as imagens vão ser buidades por outro container do docker, mas dessa vez um usando o maven por ser uma aplicação java
+	
+	docker run -ti -v $PWD/java-app:/app maven:3-alpine sh #na formação
+	docker run --rm -ti -v C:/Users/admin/Desktop/formação/material-de-foma-oes/jenkins/pipeline/java-app:/app -v /root/.m2/:/root/.m2/  -w /app maven:3-alpine sh
+
+	cd /app 
+	
+	quando aparecer o pom e o src -> mvn package para dar build 
+	
+	#entra direto no diretório em a shell interativa e builda o programa
+	docker run --rm -v C:/Users/admin/Desktop/formação/material-de-foma-oes/jenkins/pipeline/java-app:/app -v /root/.m2/:/root/.m2/  -w /app maven:3-alpine mvn -B -DskipTestes clean package
+	
+	
+	#criamos o mvn.bat na pasta build mas 	não funciona
+		para chamar o arquivo passamos C:\Users\admin\Desktop\formação\material-de-foma-oes\jenkins\pipeline\jenkins\build/mvn.bat
+	
+	
+	
+	
+	
+	#Buildando a imagem no [diretório build]
+	primeiro copie o .jar do diretório C:\Users\admin\Desktop\formação\material-de-foma-oes\jenkins\pipeline\java-app\target para o diretório C:\Users\admin\Desktop\formação\material-de-foma-oes\jenkins\pipeline\jenkins\test
+	
+	docker build -f Dockerfile-Java -t test .
+	
+	#testar o que buildamos
+	docker run --rm -ti test sh
+	
+	
+	#criar o teste automáricamente 
+	docker-compose -f docker-compose-build.yml build 
